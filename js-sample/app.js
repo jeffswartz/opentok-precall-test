@@ -1,30 +1,66 @@
-var API_KEY = '100'; // your API_KEY
-var SESSION_ID = '1_MX4xMDB-fjE0MzY0ODg2NDA5NjZ-aVFLMHlvbVZoelRWZDdqMWVKRk9UeGh4fn4'; // your SESSION_ID
-var TOKEN = 'T1==cGFydG5lcl9pZD0xMDAmc2lnPTMxN2ViNmU5ZDhhODI5Mzg1MzYzMTdlYzkwZDNmYzE5ZDA4MmQwYTE6c2Vzc2lvbl9pZD0xX01YNHhNREItZmpFME16WTBPRGcyTkRBNU5qWi1hVkZMTUhsdmJWWm9lbFJXWkRkcU1XVktSazlVZUdoNGZuNCZjcmVhdGVfdGltZT0xNDM2NDg4NjQyJm5vbmNlPTI2Mjgmcm9sZT1tb2RlcmF0b3Imc2Vzc2lvbklkPTFfTVg0eE1EQi1makUwTXpZME9EZzJOREE1TmpaLWFWRkxNSGx2YlZab2VsUldaRGRxTVdWS1JrOVVlR2g0Zm40'; // your TOKEN
+/**
+* Replace these with your OpenTok API key, a session ID for a routed OpenToksession,
+* and a token that has the publish role:
+*/
+
+var API_KEY = '';
+var SESSION_ID = '';
+var TOKEN = '';
 var TEST_TIMEOUT_MS = 15000; // 15 seconds
 
-var pluck = function(arr, propertName) {
-  return arr.map(function(value) {
-    return value[propertName];
+var publisherEl = document.createElement('div');
+var subscriberEl = document.createElement('div');
+var session;
+var publisher;
+var subscriber;
+var statusContainerEl;
+var statusMessageEl;
+var statusIconEl;
+
+var testStreamingCapability = function(subscriber, callback) {
+  performQualityTest({subscriber: subscriber, timeout: TEST_TIMEOUT_MS}, function(error, results) {
+    console.log('Test concluded', results);
+
+    var audioVideoSupported = results.video.bitsPerSecond > 250000 &&
+      results.video.packetLossRatioPerSecond < 0.03 &&
+      results.audio.bitsPerSecond > 25000 &&
+      results.audio.packetLossRatioPerSecond < 0.05;
+
+    if (audioVideoSupported) {
+      return callback(false, {
+        text: 'You\'re all set!',
+        icon: 'assets/icon_tick.svg'
+      });
+    }
+
+    if (results.audio.packetLossRatioPerSecond < 0.05) {
+      return callback(false, {
+        text: 'Your bandwidth can support audio only',
+        icon: 'assets/icon_warning.svg'
+      });
+    }
+
+    // try audio only to see if it reduces the packet loss
+    statusMessageEl.innerText = 'Trying audio only';
+    publisher.publishVideo(false);
+
+    performQualityTest({subscriber: subscriber, timeout: 5000}, function(error, results) {
+      var audioSupported = results.audio.bitsPerSecond > 25000 &&
+          results.audio.packetLossRatioPerSecond < 0.05;
+
+      if (audioSupported) {
+        return callback(false, {
+          text: 'Your bandwidth can support audio only',
+          icon: 'assets/icon_warning.svg'
+        });
+      }
+
+      return callback(false, {
+        text: 'Your bandwidth is too low for audio',
+        icon: 'assets/icon_error.svg'
+      });
+    });
   });
-};
-
-var sum = function(arr, propertyName) {
-  if (typeof propertyName !== 'undefined') {
-    arr = pluck(arr, propertyName);
-  }
-
-  return arr.reduce(function(previous, current) {
-    return previous + current;
-  }, 0);
-};
-
-var max = function(arr) {
-  return Math.max.apply(undefined, arr);
-};
-
-var min = function(arr) {
-  return Math.min.apply(undefined, arr);
 };
 
 var calculatePerSecondStats = function(statsBuffer, seconds) {
@@ -165,61 +201,6 @@ var performQualityTest = function(config, callback) {
   });
 };
 
-var publisherEl = document.createElement('div');
-var subscriberEl = document.createElement('div');
-var session;
-var publisher;
-var subscriber;
-var statusContainerEl;
-var statusMessageEl;
-var statusIconEl;
-
-var testStreamingCapability = function(subscriber, callback) {
-  performQualityTest({subscriber: subscriber, timeout: TEST_TIMEOUT_MS}, function(error, results) {
-    console.log('Test concluded', results);
-
-    var audioVideoSupported = results.video.bitsPerSecond > 250000 &&
-      results.video.packetLossRatioPerSecond < 0.03 &&
-      results.audio.bitsPerSecond > 25000 &&
-      results.audio.packetLossRatioPerSecond < 0.05;
-
-    if (audioVideoSupported) {
-      return callback(false, {
-        text: 'You\'re all set!',
-        icon: 'assets/icon_tick.svg'
-      });
-    }
-
-    if (results.audio.packetLossRatioPerSecond < 0.05) {
-      return callback(false, {
-        text: 'Your bandwidth can support audio only',
-        icon: 'assets/icon_warning.svg'
-      });
-    }
-
-    // try audio only to see if it reduces the packet loss
-    statusMessageEl.innerText = 'Trying audio only';
-    publisher.publishVideo(false);
-
-    performQualityTest({subscriber: subscriber, timeout: 5000}, function(error, results) {
-      var audioSupported = results.audio.bitsPerSecond > 25000 &&
-          results.audio.packetLossRatioPerSecond < 0.05;
-
-      if (audioSupported) {
-        return callback(false, {
-          text: 'Your bandwidth can support audio only',
-          icon: 'assets/icon_warning.svg'
-        });
-      }
-
-      return callback(false, {
-        text: 'Your bandwidth is too low for audio',
-        icon: 'assets/icon_error.svg'
-      });
-    });
-  });
-};
-
 var callbacks = {
   onInitPublisher: function onInitPublisher(error) {
     if (error) {
@@ -302,3 +283,27 @@ document.addEventListener('DOMContentLoaded', function() {
   statusMessageEl = statusContainerEl.querySelector('p');
   statusIconEl = statusContainerEl.querySelector('img');
 });
+
+var pluck = function(arr, propertName) {
+  return arr.map(function(value) {
+    return value[propertName];
+  });
+};
+
+var sum = function(arr, propertyName) {
+  if (typeof propertyName !== 'undefined') {
+    arr = pluck(arr, propertyName);
+  }
+
+  return arr.reduce(function(previous, current) {
+    return previous + current;
+  }, 0);
+};
+
+var max = function(arr) {
+  return Math.max.apply(undefined, arr);
+};
+
+var min = function(arr) {
+  return Math.min.apply(undefined, arr);
+};
