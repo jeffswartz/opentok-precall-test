@@ -1,3 +1,5 @@
+/* global document, window, OT */
+
 /**
 * Replace these with your OpenTok API key, a session ID for a routed OpenTok session,
 * and a token that has the publish role:
@@ -20,7 +22,6 @@ var statusIconEl;
 
 var testStreamingCapability = function(subscriber, callback) {
   performQualityTest({subscriber: subscriber, timeout: TEST_TIMEOUT_MS}, function(error, results) {
-    console.log('Test concluded', results);
     // If we tried to set video constraints, but no video data was found
     if (!results.video) {
       var audioSupported = results.audio.bitsPerSecond > 25000 &&
@@ -35,7 +36,7 @@ var testStreamingCapability = function(subscriber, callback) {
       }
 
       return callback(false, {
-          text: 'You can\'t do video because no camera was found, ' +
+        text: 'You can\'t do video because no camera was found, ' +
             'and your bandwidth is too low for an audio-only stream',
         icon: 'assets/icon_warning.svg'
       });
@@ -63,8 +64,8 @@ var testStreamingCapability = function(subscriber, callback) {
     // try audio only to see if it reduces the packet loss
     setText(
       statusMessageEl,
-     'Trying audio only'
-   );
+      'Trying audio only'
+    );
 
     publisher.publishVideo(false);
 
@@ -305,8 +306,7 @@ function bandwidthCalculatorObj(config) {
 
       intervalId = window.setInterval(function() {
         config.subscriber.getStats(function(error, stats) {
-          var activeMediaTypes = Object.keys(stats)
-          .filter(function(key) {
+          var activeMediaTypes = Object.keys(stats).filter(function(key) {
             return key !== 'timestamp';
           });
           var snapshot = {};
@@ -370,8 +370,6 @@ function performQualityTest(config, callback) {
   window.setTimeout(cleanupAndReport, config.timeout);
 
   bandwidthCalculator.start(function(stats) {
-    console.log(stats);
-
     // you could do something smart here like determine if the bandwidth is
     // stable or acceptable and exit early
     currentStats = stats;
