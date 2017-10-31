@@ -20,13 +20,14 @@ test session. Do not use the test session for your actual call. Use a separate O
 
 To configure and test the app:
 
-1. At the top of the app.js file, set the following to your OpenTok API, a session ID, and a token
-   for that session:
+1. Make a copy of the js-sample/sampleConfig.js file at js-sample/config.js. Edit that file
+   and set the following to the API key for your OpenTok project, a session ID for that project,
+   and a token for that session:
 
    ```
-   var API_KEY = '';
-   var SESSION_ID = '';
-   var TOKEN = '';
+   apiKey: '';
+   sessionId: '';
+   token = '';
    ```
 
    **Important:** You must use a unique session, with its own session ID, for the network test. This
@@ -42,8 +43,8 @@ To configure and test the app:
    one of the [OpenTok server SDKs](https://tokbox.com/developer/sdks/server/) to generate a
    session ID and token.
 
-2. Install the sample code on a web server. Note that you must load the code from a web server.
-   Browsers do not support WebRTC video in pages loaded from a file:// URL.
+2. Run `npm install`. Then run `npm run package` (and run this any time you modify source code
+   for the app).
 
 3. In a web browser, navigate to the index.html page for the app.
 

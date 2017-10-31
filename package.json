@@ -1,0 +1,28 @@
+{
+  "name": "opentok-network-test",
+  "version": "1.0.0",
+  "description": "OpenTok Network Test",
+  "main": "lib/opentok-network-test",
+  "scripts": {
+    "test": "gulp test",
+    "start": "gulp build && gulp serve"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jeffswartz/opentok-network-test.git"
+  },
+  "author": "swartz@tokbox.com",
+  "license": "MIT",
+  "homepage": "https://github.com/opentok/opentok-network-test",
+  "scripts": {
+    "lint": "./node_modules/eslint/bin/eslint.js lib js-sample/index.js"
+  },
+  "devDependencies": {
+    "eslint": "^4.10.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0"
+  },
+  "dependencies": {
+    "@opentok/client": "^2.12.0"
+  }
+}
