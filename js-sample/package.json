@@ -4,6 +4,7 @@
   "description": "OpenTok Network Test Sample App",
   "main": "lib/opentok-network-test",
   "scripts": {
+    "package": "./node_modules/webpack/bin/webpack.js index.js bundle.js",
     "test": "gulp test",
     "start": "gulp build && gulp serve"
   },
@@ -14,9 +15,6 @@
   "author": "swartz@tokbox.com",
   "license": "MIT",
   "homepage": "https://github.com/opentok/opentok-network-test",
-  "scripts": {
-    "package": "./node_modules/webpack/bin/webpack.js index.js bundle.js"
-  },
   "devDependencies": {
     "webpack": "^3.8.1"
   },

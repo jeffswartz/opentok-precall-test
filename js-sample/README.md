@@ -146,7 +146,7 @@ var audioVideoSupported = results.video.bitsPerSecond > 250000
 if (audioVideoSupported) {
   return callback(false, {
     text: "You're all set!",
-    icon: 'assets/icon_tick.svg'
+    icon: 'assets/icon_pass.svg'
   });
 }
 
